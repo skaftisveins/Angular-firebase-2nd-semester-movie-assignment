@@ -1,0 +1,119 @@
+<div *ngIf="movie$ | async as movie" class="card border-secondary text-white bg-dark mb-3">
+
+  <div class="container card-body text-light">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="{{ data.largePoster }}{{ movie.poster_path }}" ngbTooltip="Click on movie poster to go back" [openDelay]="500" [closeDelay]="100"  class="images rounded img-fluid my-1 mx-1"
+            (click)="goBack()">
+          
+          <div *ngIf="auth.user$ | async as user" class="mt-2">
+            <button [@bounce]=bounce type="button" data-toggle="button" class="btn btn-sm btn-danger m-1" ngbTooltip="Click to add to your list" [openDelay]="500" [closeDelay]="100" (click)="addMovieToFav(user.uid, movie)"><i class="fas fa-heart"></i></button>
+            <button type="button" class="btn btn-sm btn-light m-1" ngbTooltip="Your list of favorite movies" [openDelay]="500" [closeDelay]="100" (click)="showMyFavMovies(user.uid, movie.id)"><i class="fas fa-list"></i></button>
+            <button type="button" class="btn btn-sm btn-primary m-1" ngbTooltip="Give like" [openDelay]="500" [closeDelay]="100" (click)="giveThumbsUpVote(movie)"><i class="far fa-thumbs-up"></i></button>
+            <button type="button" class="btn btn-sm btn-primary m-1" ngbTooltip="Give dislike" [openDelay]="500" [closeDelay]="100" (click)="giveThumbsDownVote(movie)"><i class="far fa-thumbs-down"></i></button>
+            <button type="button" class="btn btn-sm btn-secondary m-1" ngbTooltip="Remove from your list of favorite movies" [openDelay]="500" [closeDelay]="100" (click)="removeMovieFromFav(user.uid, movie.id)"><i class="fas fa-eraser"></i></button>
+            
+            <div *ngIf="ratings$ | async as rating">
+              <p class="userRating font-weight-bold mt-2">Likes: <span class="font-weight-normal lead text-muted">{{ rating.like }}</span></p>
+              <p class="userRating font-weight-bold">Disikes: <span class="font-weight-normal lead text-muted"> {{ rating.dislike }}</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h2 class="title card-title">{{ movie.title }}<small class="text-muted"> ({{ movie.release_date }})</small>
+          </h2>
+          <p class="tagline font-weight-light lead">{{ movie.tagline }}</p>
+          <p class="description card-text" [innerHTML]="movie.overview"></p>
+          <p class="rating font-weight-bold">Rating: <span class="font-weight-normal lead"
+              [innerHTML]="movie.vote_average"></span><small> ({{ movie.vote_count }} votes)</small></p>
+          <p class="runtime font-weight-bold">Runtime:
+            <span class="font-weight-normal" [innerHTML]="movie.runtime"></span><small> (min)</small>
+          </p>
+          <p class="release_date font-weight-bold">Release date:
+            <span class="font-weight-normal text-muted" [innerHTML]="movie.release_date"></span>
+          </p>
+          
+          <div *ngIf="movie.genres" class="card-text genres">
+            <span *ngFor="let genre of movie.genres" class="badge badge-secondary m-1">{{ genre.name }}</span>
+          </div>
+          <div class="fixed-bottom position-relative mt-2">
+            <div class="hovereffect">
+              <div *ngIf="hideTrailer; then trailer else imgShow"></div>
+              <ng-template #imgShow>
+
+                <img src="{{ data.backdropCover }}{{ movie.backdrop_path }}"
+                class="img-responsive images rounded img-fluid">
+                <div class="overlay position-absolute" style="top: 65%; width: 100%;">
+                    <a class="trailer" style="text-decoration: none;">
+                        <h5 class="text-white" (click)="onSelected(movie)">Play Trailer</h5>
+                      </a>
+                    </div>
+              </ng-template>
+              <ng-template #trailer>
+                <div *ngIf="video$ | async as video" class="embed">
+                  <iframe width="560" height="315" *ngIf="video" class="embed-responsive-item" [src]="video | safeResourceUrl" frameborder="0"
+                    allowfullscreen="allowfullscreen" allow="autoplay">
+                  </iframe>
+                </div>
+            </ng-template>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer bg-dark border-light mt-4" *ngIf="auth.user$ | async as user">
+      <div class="row">
+        <div class="col-md-12">
+          <label>Leave your comment</label><span class="text-muted mx-2">fx. did you like this movie?</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <form [formGroup]="form" (ngSubmit)="onPostComment()">
+            <textarea class="p-2" formControlName="message" name="comment" cols="80" rows="4" style="opacity: 0.8;" placeholder="Leave your comment..." ngbTooltip="Tip: comment must be at least four letters" [openDelay]="500" [closeDelay]="100"></textarea>
+            <button type="submit" class="btn btn-outline-primary ml-2 mb-4">Submit</button>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h6>Comments</h6>
+          <div *ngFor="let comment of comments$ | async" class="media text-muted pt-3">
+            <ul class="list-group col-md-6">
+              <li class="list-group-item list-group-item-dark">
+                
+                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                  <strong class="d-block text-gray-dark">{{ comment.authorName }}<span class="sep font-weight-light">{{ comment.created | dateFormat }}</span></strong>
+                  {{ comment.message }}
+                </p>
+                
+                <div *ngIf="editState && commentToEdit.id == comment.id">
+                  <form (ngSubmit)="onUpdateComment(comment)">
+                      <textarea formControlName="message" name="comment" cols="60" rows="4" style="opacity: 0.8;" placeholder="Edit your comment..."></textarea>
+                      <input type="submit" value="Update Comment" class="btn btn-sm btn-warning mx-2 float-right">
+                      <button (click)="onDeleteComment(movie.id, comment.cid)" type="submit" class="btn btn-sm btn-danger mx-2 float-right">Delete</button>
+                  </form>
+                </div>
+              </li>
+            </ul>
+            <button *ngIf="auth.canEdit(user)" ngbTooltip="Edit a comment" [openDelay]="500" [closeDelay]="100"  class="btn btn-sm btn-outline-warning m-1" (click)="onEditComment(movie.id, comment)"><span style="font-size: 0.9em;"><i class="far fa-edit"></i></span></button>
+            <button *ngIf="auth.canDelete(user)" ngbTooltip="Delete a comment" [openDelay]="500" [closeDelay]="100"  class="btn btn-sm btn-outline-danger m-1" (click)="onDeleteComment(movie.id, comment.cid)"><span style="font-size: 0.9em"><i class="fas fa-ban"></i></span></button>
+          </div>
+        </div>
+        <!-- <div *ngFor="let comment of comments$ | async" class="col span-1-of-3">
+            <button class="btn btn-warning m-1 p-1" (click)="update(comment.id)">Edit</button>
+            <button class="btn btn-danger m-1 p-1" (click)="delete(comment.id)">Delete</button>
+            <div class="col span-2-of-3">
+              <p></p>
+              <p></p>
+            </div>
+          </div> -->
+      </div>
+
+    </div>
+  </div>
+
+</div>
+

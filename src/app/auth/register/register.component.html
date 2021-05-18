@@ -1,0 +1,17 @@
+<div *ngIf="afAuth.authState | async as authUser; else loginTemplate">
+  <div class="col-md-4 d-block-inline">
+    <div class="row">
+      <img [src]="authUser.photoURL" class="avatar m-2" height="42" width="42">
+      <h1 class="d-block-inline font-weight-bold lead mt-3"> {{ authUser.displayName }}</h1>
+    </div>
+  </div>
+
+  </div>
+<ng-template #loginTemplate>
+  <button class="btn btn-danger" (click)="googleLogin()">
+      <i class="fab fa-google"></i> Login with Google
+  </button>
+
+</ng-template>
+
+

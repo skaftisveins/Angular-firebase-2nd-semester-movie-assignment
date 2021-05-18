@@ -1,0 +1,19 @@
+.movies {
+    position: relative;
+    list-style: none;
+}
+
+.images {
+    float: left;
+    padding: 2px;
+    cursor: pointer;
+    width: 198px;
+    height: 294px;
+    transition: transform .2s;
+}
+
+.images:hover {
+    transform: scale(0.98);
+}
+
+

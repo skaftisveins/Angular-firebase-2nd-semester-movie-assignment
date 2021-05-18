@@ -1,0 +1,9 @@
+footer {
+    height: 3em;
+}
+
+span {
+    font-size: 1.2rem;
+    word-spacing: 10px;
+    text-align: center;
+}

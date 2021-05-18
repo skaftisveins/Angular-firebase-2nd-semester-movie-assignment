@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="col-12">
+    <h2 class="text-secondary" style="text-align: center;">{{ temp }}</h2>
+    <nav class="navbar justify-content-center">
+      <div class="col-md-4 mx-4 col-sm-6 m-2 ">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search for a movie..." aria-label="Search"
+          [(ngModel)]="nameSearch">
+
+      </div>
+      <div class="col-md-4 mx-2 col-sm-6 m-2">
+        <select class="custom-select" (change)="onSelectGenre($event.target.value)">
+          <option value="">Genres</option>
+          <option value="{{ genre.id }}" *ngFor="let genre of genreList">{{ genre.name }}</option>
+        </select>
+
+      </div>
+      <button class="btn btn-sm btn-light" (click)="getPopular()"><i class="fas fa-fire"></i></button>
+      <button class="btn btn-sm btn-light" (click)="getTopRated()"><i class="far fa-star"></i></button>
+      <button class="btn btn-sm btn-light" (click)="getUpComing()"><i class="fas fa-meteor"></i></button>
+
+    </nav>
+    
+      <ngb-pagination class="d-flex justify-content-center" (pageChange)="setPage($event)" size="sm" [collectionSize]="pageSize * 10" [(page)]="currentPage"
+        [maxSize]="5" [boundaryLinks]="true" [rotate]="true"></ngb-pagination>
+    
+    <ul class="movies">
+      <li *ngFor="let movie of movies | genreFilter: selectedGenre | searchByName: nameSearch" [@fadeInMovies]>
+        <a [routerLink]="['/detail', movie.id]">
+          <!-- <a href="#" class="btn-info btn-sm badge">&#10084;</a> -->
+          <img src="{{ data.basePoster }}{{ movie.poster_path }}" alt="Movies" class="images">
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="row mx-auto py-4">
+    <ngb-pagination (pageChange)="setPage($event)" size="sm" [collectionSize]="pageSize * 10" [(page)]="currentPage"
+      [maxSize]="5" [boundaryLinks]="true" [rotate]="true"></ngb-pagination>
+  </div>
+</div>

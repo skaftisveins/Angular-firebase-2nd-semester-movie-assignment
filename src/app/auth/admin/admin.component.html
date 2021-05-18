@@ -1,0 +1,19 @@
+<div class="col-md-12">
+  <div class="row justify-content-center">
+  <h2 class="font-weight-bold lead text-center">Registered users</h2>
+</div>
+<div class="row justify-content-center">
+  <button class="btn btn-primary btn-sm m-2" (click)="registeredUsers()">Show all users</button>
+  <button class="btn btn-success btn-sm m-2" (click)="showActiveUsers()">Show active users</button>
+</div>
+</div>
+<div class="col-md-12 row justify-content-center">
+  <ul *ngFor="let user of activeUsers$ | async" class="list-group col-md-4 m-2">
+    <button type="button" class="btn btn-sm btn-success list-group-item list-group-item-dark" data-toggle="button" aria-pressed="false">
+      <!-- <img [src]="user.photoURL" class="avatar m-2" height="42" width="42"> -->
+      <h4 class="d-block-inline font-weight-bold lead mt-3"> {{ user.displayName }}
+      <pre class="d-block-inline font-weight-normal lead mt-2">{{ user.status }}</pre></h4>
+      <p>{{ user.uid }}</p><p>{{ user.email }}</p>
+    </button>
+  </ul>
+</div>

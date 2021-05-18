@@ -1,0 +1,58 @@
+<ng-container *ngIf="user$ | async as user; then authenticated else loginTemplate"></ng-container>
+<!-- <div *ngIf="afAuth.authState | async as authUser; else loginTemplate"> -->
+
+<!-- User logged in -->
+<ng-template #authenticated let-user="$implicit">
+  <div class="col-md-4 d-block-inline">
+    <div class="row">
+      <img [src]="user.photoURL" class="avatar m-2" height="42" width="42">
+      <h1 class="d-block-inline font-weight-bold lead mt-3"> {{ user.displayName }}</h1>
+    </div>
+  </div>
+
+  <h2>favorite movies</h2>
+  <div class="container card-body text-dark">
+    <div class="col-md-12">
+      <div class="row">
+        <!-- <ul *ngFor="let favMovie of userFavMovies$ | async">
+          <li>
+            {{ favMovie.displayName }}
+            {{ favMovie.uid }}
+            {{ favMovie.payload.val().title }}
+          </li>
+        </ul> -->
+        <div *ngFor="let fav of myFavMovies$ | async" [@fadeInFavMovies]
+          class="card border-secondary text-white bg-dark mb-3">
+          <a [routerLink]="['/detail', fav.id]">
+            <img src="{{ data.basePoster }}{{ fav.poster_path }}" class="images rounded img-fluid my-1 mx-1"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- </div> -->
+
+<!-- User NOT logged in -->
+<ng-template #loginTemplate>
+  <div class="card border-secondary text-white bg-dark">
+
+    <div class="container card-body text-light">
+      <div class="col-md-12">
+        <div class="row justify-content-center">
+          <h1 class="card-title">Welcome, guest</h1>
+        </div>
+        <div class="row justify-content-center">
+          <p class="font-weight-italic lead">Login to get started</p>
+        </div>
+        <div class="row justify-content-center">
+          <button class="btn btn-danger" (click)="authService.googleLogin()">
+            <i class="fab fa-google"></i> Login with Google
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</ng-template>
